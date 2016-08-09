@@ -87,7 +87,7 @@
                        "execNewPod": {
                           "containerName": "nexus",
                           "command": [
-                             "/tmp/addjbossrepo.sh"
+                             "touch /tmp/teste123"
                           ]
                        }
                     },
