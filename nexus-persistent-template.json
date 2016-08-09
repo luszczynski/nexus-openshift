@@ -80,15 +80,15 @@
                     "rollingParams": {
                        "updatePeriodSeconds": 1,
                        "intervalSeconds": 1,
-                       "timeoutSeconds": 600
-                    },
-                    "post": {
-                       "failurePolicy": "Retry",
-                       "execNewPod": {
-                          "containerName": "nexus",
-                          "command": [
-                             "touch /tmp/teste123"
-                          ]
+                       "timeoutSeconds": 600,
+                       "post": {
+                          "failurePolicy": "Retry",
+                          "execNewPod": {
+                             "containerName": "nexus",
+                             "command": [
+                                "/tmp/addjbossrepo.sh"
+                             ]
+                          }
                        }
                     },
                     "resources": {}
