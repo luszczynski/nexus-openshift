@@ -83,7 +83,7 @@
                        "timeoutSeconds": 600
                     },
                     "post": {
-                       "failurePolicy": "Ignore",
+                       "failurePolicy": "Retry",
                        "execNewPod": {
                           "containerName": "nexus",
                           "command": [
