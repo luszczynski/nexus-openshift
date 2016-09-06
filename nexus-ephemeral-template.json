@@ -112,7 +112,9 @@
                         }
                     }],
                     "restartPolicy": "Always",
-                    "dnsPolicy": "ClusterFirst"
+                    "dnsPolicy": "ClusterFirst",
+                    "serviceAccount": "nexus",
+                    "serviceAccountName": "nexus"
                 }
             }
         },
