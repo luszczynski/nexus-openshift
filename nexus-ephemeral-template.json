@@ -1,0 +1,140 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "nexus-ephemeral",
+        "creationTimestamp": null,
+        "annotations": {
+            "description": "Nexus service, with ephe storage",
+            "tags": "repository-managers,nexus"
+        }
+    },
+    "objects": [{
+        "kind": "Service",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${NEXUS_SERVICE_NAME}",
+            "creationTimestamp": null
+        },
+        "spec": {
+            "ports": [{
+                "name": "http",
+                "port": 8081,
+                "targetPort": 8081
+            }],
+            "selector": {
+                "name": "${NEXUS_SERVICE_NAME}"
+            },
+            "portalIP": "",
+            "type": "ClusterIP",
+            "sessionAffinity": "None"
+        },
+        "status": {
+            "loadBalancer": {}
+        }
+    }, {
+        "kind": "Route",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "nexus"
+        },
+        "spec": {
+            "host": "${APPLICATION_HOSTNAME}",
+            "to": {
+                "kind": "Service",
+                "name": "${NEXUS_SERVICE_NAME}"
+            }
+        }
+    }, {
+        "kind": "DeploymentConfig",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "${NEXUS_SERVICE_NAME}",
+            "creationTimestamp": null
+        },
+        "spec": {
+            "strategy": {
+                "type": "Rolling",
+                "rollingParams": {
+                    "updatePeriodSeconds": 1,
+                    "intervalSeconds": 1,
+                    "timeoutSeconds": 600
+                },
+                "resources": {}
+            },
+            "triggers": [{
+                "type": "ConfigChange"
+            }],
+            "replicas": 1,
+            "selector": {
+                "name": "${NEXUS_SERVICE_NAME}"
+            },
+            "template": {
+                "metadata": {
+                    "creationTimestamp": null,
+                    "labels": {
+                        "name": "${NEXUS_SERVICE_NAME}"
+                    }
+                },
+                "spec": {
+                    "containers": [{
+                        "name": "nexus",
+                        "image": "luszczynski/nexus-ose:latest",
+                        "ports": [{
+                            "containerPort": 8081,
+                            "protocol": "TCP"
+                        }],
+                        "livenessProbe": {
+                            "httpGet": {
+                                "port": 8081
+                            },
+                            "initialDelaySeconds": 300,
+                            "timeoutSeconds": 1
+                        },
+                        "readinessProbe": {
+                            "httpGet": {
+                                "port": 8081
+                            },
+                            "initialDelaySeconds": 20,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "${MEMORY_LIMIT}"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "imagePullPolicy": "IfNotPresent",
+                        "capabilities": {},
+                        "securityContext": {
+                            "capabilities": {},
+                            "privileged": false
+                        }
+                    }],
+                    "restartPolicy": "Always",
+                    "dnsPolicy": "ClusterFirst"
+                }
+            }
+        },
+        "status": {}
+    }],
+    "parameters": [{
+        "name": "MEMORY_LIMIT",
+        "displayName": "Memory Limit",
+        "description": "Maximum amount of memory the container can use.",
+        "value": "512Mi"
+    }, {
+        "name": "NEXUS_SERVICE_NAME",
+        "displayName": "Database Service Name",
+        "description": "The name of the OpenShift Service exposed for the database.",
+        "value": "nexus",
+        "required": true
+    }, {
+        "description": "Custom hostname for service routes.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
+        "displayName": "Nexus instance hostname",
+        "name": "APPLICATION_HOSTNAME"
+    }],
+    "labels": {
+        "template": "nexus-ephemeral-template"
+    }
+}
