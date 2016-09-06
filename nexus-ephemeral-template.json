@@ -108,7 +108,7 @@
                         "capabilities": {},
                         "securityContext": {
                             "capabilities": {},
-                            "privileged": false
+                            "privileged": true
                         }
                     }],
                     "restartPolicy": "Always",
